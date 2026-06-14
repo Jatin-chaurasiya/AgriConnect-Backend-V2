@@ -21,6 +21,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.List;
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -73,7 +75,10 @@ public class SecurityConfig {
 
         configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(
-                java.util.List.of("http://localhost:5173")
+                List.of(
+                        "http://localhost:5173",
+                        "https://agri-connect-89.netlify.app"
+                )
         );
 
         configuration.setAllowedHeaders(
