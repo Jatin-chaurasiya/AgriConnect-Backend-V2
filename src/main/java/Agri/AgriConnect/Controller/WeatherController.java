@@ -30,4 +30,17 @@ public class WeatherController {
     public String test() {
         return "Weather Working";
     }
+    @GetMapping("/debug")
+    public String debug() {
+        try {
+            weatherService.getWeatherData(
+                    "Uttar Pradesh",
+                    "Lucknow",
+                    null
+            );
+            return "SUCCESS";
+        } catch (Exception e) {
+            return e.toString();
+        }
+    }
 }

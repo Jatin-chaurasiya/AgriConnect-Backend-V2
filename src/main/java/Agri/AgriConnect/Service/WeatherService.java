@@ -41,19 +41,15 @@ public class WeatherService {
         String cityLocation = city + "," + state + ",IN";
 
         try {
-            // village (if provided)
             if (villageProvided) {
                 return buildWeatherResponse(villageLocation,
                         village + ", " + city + ", " + state);
             }
 
-            // If no village, directly fetch city weather
             return buildWeatherResponse(cityLocation,
                     city + ", " + state);
 
         } catch (Exception e) {
-
-            //if village failed, try city
             if (villageProvided) {
                 try {
                     return buildWeatherResponse(cityLocation,
@@ -78,12 +74,14 @@ public class WeatherService {
             throws RestClientException {
 
         try {
-
+            System.out.println("API KEY = " + apiKey);
             String currentUrl = buildUrl("weather", location);
+            System.out.println("CURRENT URL = " + currentUrl);
             String forecastUrl = buildUrl("forecast", location);
 
             String currentResponse =
                     restTemplate.getForObject(currentUrl, String.class);
+            System.out.println(currentResponse);
 
             String forecastResponse =
                     restTemplate.getForObject(forecastUrl, String.class);
