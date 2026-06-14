@@ -40,7 +40,10 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/auth/register",
                                 "/auth/login",
+
+                                "/weather",
                                 "/weather/**",
+
                                 "/chat/**",
                                 "/schemes",
                                 "/schemes/**",
