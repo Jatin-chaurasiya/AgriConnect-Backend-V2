@@ -26,4 +26,8 @@ public class WeatherController {
                 weatherService.getWeatherData(state, city, village)
         );
     }
+    @GetMapping("/test")
+    public String test() {
+        return "Weather Working";
+    }
 }
