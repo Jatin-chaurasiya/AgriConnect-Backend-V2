@@ -80,7 +80,8 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(
                 List.of(
                         "http://localhost:5173",
-                        "https://agri-connect-89.netlify.app"
+                        "https://agri-connect-89.netlify.app",
+                        "http://agriconnect.jatindev.xyz"
                 )
         );
 
