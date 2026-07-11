@@ -57,12 +57,29 @@ public class ServiceServiceImpl implements ServiceService {
     }
 
     @Override
-    public List<ServiceResponseDto> getAllServices() {
+    public Page<ServiceResponseDto> getAllServices(
+            int page,
+            int size,
+            String keyword
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ServiceEntity> services;
+        if (keyword == null || keyword.trim().isEmpty()) {
+            services =
+                    serviceRepository.findByStatusTrueAndAvailabilityTrue(
+                            pageable
+                    );
+        } else {
 
-        return serviceRepository.findByStatusTrue()
-                .stream()
-                .map(this::convertToResponse)
-                .toList();
+            services =
+                    serviceRepository.searchServices(
+                            keyword,
+                            pageable
+                    );
+
+        }
+
+        return services.map(this::convertToResponse);
     }
     @Override
     public Page<ServiceResponseDto> getMyServices(

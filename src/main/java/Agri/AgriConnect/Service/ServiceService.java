@@ -10,8 +10,12 @@ public interface ServiceService {
 
     ServiceResponseDto addService(ServiceRequestDto request);
 
-    List<ServiceResponseDto> getAllServices();
     Page<ServiceResponseDto> getMyServices(
+            int page,
+            int size,
+            String keyword
+    );
+    Page<ServiceResponseDto> getAllServices(
             int page,
             int size,
             String keyword
