@@ -15,7 +15,6 @@ import java.util.List;
 public class FarmerServiceController {
 
     private final ServiceService serviceService;
-
     @GetMapping
     public ResponseEntity<Page<ServiceResponseDto>> getAllServices(
             @RequestParam(defaultValue = "0") int page,
@@ -34,7 +33,6 @@ public class FarmerServiceController {
     @GetMapping("/{id}")
     public ResponseEntity<ServiceResponseDto> getServiceById(
             @PathVariable Long id) {
-
         return ResponseEntity.ok(serviceService.getServiceById(id));
     }
 }
