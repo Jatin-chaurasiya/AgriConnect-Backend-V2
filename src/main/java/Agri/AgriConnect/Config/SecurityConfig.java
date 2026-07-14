@@ -44,12 +44,15 @@ public class SecurityConfig {
                         .requestMatchers("/chat/**").permitAll()
                         .requestMatchers("/schemes/**").permitAll()
                         .requestMatchers("/api/crop/**").permitAll()
+                        .requestMatchers("/test/send-email").permitAll()
 
                         // Farmer APIs
                         .requestMatchers("/farmer/**").hasRole("FARMER")
 
                         // Provider APIs
                         .requestMatchers("/provider/**").hasRole("PROVIDER")
+                        .requestMatchers("/bookings/provider/**")
+                        .hasRole("PROVIDER")
 
                         // Admin APIs
                         .requestMatchers("/admin/**").hasRole("ADMIN")

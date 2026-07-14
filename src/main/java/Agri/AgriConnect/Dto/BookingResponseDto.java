@@ -27,6 +27,6 @@ public class BookingResponseDto {
     private String bookingTime;
 
     private BookingStatus status;
-
+    private String rejectionReason;
     private String paymentStatus;
 }

@@ -7,8 +7,10 @@ import Agri.AgriConnect.Entity.tbl_profiles;
 import Agri.AgriConnect.Enum.BookingStatus;
 import Agri.AgriConnect.Repository.BookingRepository;
 import Agri.AgriConnect.Repository.ProfileRepository;
+import Agri.AgriConnect.Repository.ProviderDetailsRepository;
 import Agri.AgriConnect.Repository.ServiceRepository;
 import Agri.AgriConnect.Service.BookingService;
+import Agri.AgriConnect.Service.EmailService;
 import Agri.AgriConnect.Util.RazorpaySignatureUtil;
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
@@ -21,6 +23,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import Agri.AgriConnect.Repository.ProviderDetailsRepository;
+import Agri.AgriConnect.Entity.tbl_provider_details;
+import java.util.List;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,11 +36,13 @@ import java.time.LocalTime;
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
+    private final EmailService emailService;
     private final RazorpayClient razorpayClient;
     private final ServiceRepository serviceRepository;
     private final BookingRepository bookingRepository;
     private final ProfileRepository profileRepository;
     private final RazorpaySignatureUtil razorpaySignatureUtil;
+    private final ProviderDetailsRepository providerDetailsRepository;
 
     @Value("${razorpay.key.secret}")
     private String razorpayKeySecret;
@@ -166,6 +173,134 @@ public class BookingServiceImpl implements BookingService {
         }
         bookingRepository.delete(booking);
     }
+    private tbl_provider_details getCurrentProvider() {
+
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        String email = authentication.getName();
+
+        tbl_profiles profile = profileRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("Profile not found"));
+
+        return providerDetailsRepository
+                .findByProfile(profile)
+                .orElseThrow(() ->
+                        new RuntimeException("Provider not found"));
+    }
+    @Override
+    public Page<BookingResponseDto> getProviderBookingRequests(
+            int page,
+            int size) {
+
+        tbl_provider_details provider = getCurrentProvider();
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return bookingRepository
+                .findByProviderAndStatusOrderByBookedAtDesc(
+                        provider,
+                        BookingStatus.PENDING,
+                        pageable
+                )
+                .map(this::convertToBookingResponse);
+    }
+    @Override
+    public BookingResponseDto acceptBooking(Long bookingId) {
+
+        tbl_provider_details provider = getCurrentProvider();
+
+        Booking booking = bookingRepository
+                .findByIdAndProvider(
+                        bookingId,
+                        provider
+                )
+                .orElseThrow(() ->
+                        new RuntimeException("Booking not found"));
+
+        if (booking.getStatus() != BookingStatus.PENDING) {
+            throw new RuntimeException(
+                    "Only pending booking can be accepted."
+            );
+        }
+        booking.setStatus(BookingStatus.ACCEPTED);
+        Booking updatedBooking = bookingRepository.save(booking);
+        emailService.sendBookingAcceptedEmail(updatedBooking);
+        return convertToBookingResponse(updatedBooking);
+    }
+    @Override
+    public BookingResponseDto rejectBooking(
+            Long bookingId,
+            String reason) {
+
+        tbl_provider_details provider = getCurrentProvider();
+
+        Booking booking = bookingRepository
+                .findByIdAndProvider(bookingId, provider)
+                .orElseThrow(() ->
+                        new RuntimeException("Booking not found"));
+
+        if (booking.getStatus() != BookingStatus.PENDING) {
+            throw new RuntimeException(
+                    "Only pending booking can be rejected."
+            );
+        }
+
+        booking.setStatus(BookingStatus.REJECTED);
+        booking.setRejectionReason(reason);
+
+        Booking updatedBooking = bookingRepository.save(booking);
+
+        emailService.sendBookingRejectedEmail(
+                updatedBooking,
+                reason
+        );
+
+        return convertToBookingResponse(updatedBooking);
+    }
+    @Override
+    public BookingResponseDto completeBooking(Long bookingId) {
+
+        tbl_provider_details provider = getCurrentProvider();
+
+        Booking booking = bookingRepository
+                .findByIdAndProvider(bookingId, provider)
+                .orElseThrow(() ->
+                        new RuntimeException("Booking not found"));
+
+        if (booking.getStatus() != BookingStatus.ACCEPTED) {
+            throw new RuntimeException(
+                    "Only accepted booking can be completed."
+            );
+        }
+        booking.setStatus(BookingStatus.COMPLETED);
+        Booking updatedBooking = bookingRepository.save(booking);
+        emailService.sendBookingCompletedEmail(updatedBooking);
+        return convertToBookingResponse(updatedBooking);
+    }
+    @Override
+    public Page<BookingResponseDto> getBookingHistory(
+            int page,
+            int size) {
+
+        tbl_provider_details provider = getCurrentProvider();
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return bookingRepository
+                .findByProviderAndStatusInOrderByBookedAtDesc(
+                        provider,
+                        List.of(
+                                BookingStatus.COMPLETED,
+                                BookingStatus.REJECTED
+                        ),
+                        pageable
+                )
+                .map(this::convertToBookingResponse);
+    }
     private Booking convertToBooking(
             VerifyPaymentRequestDto request,
             tbl_profiles farmer,
@@ -202,6 +337,9 @@ public class BookingServiceImpl implements BookingService {
                 .bookingDate(booking.getBookingDate().toString())
                 .bookingTime(booking.getBookingTime().toString())
                 .status(booking.getStatus())
+                .rejectionReason(
+                        booking.getRejectionReason()
+                )
                 .paymentStatus(booking.getPaymentStatus())
                 .build();
     }

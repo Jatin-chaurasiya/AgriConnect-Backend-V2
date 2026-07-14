@@ -1,12 +1,18 @@
 package Agri.AgriConnect.Controller;
 
+import Agri.AgriConnect.Service.EmailService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/test")
+@RequiredArgsConstructor
 public class TestController {
+
+    private final EmailService emailService;
 
     @GetMapping("/farmer")
     public String farmer() {
@@ -21,5 +27,15 @@ public class TestController {
     @GetMapping("/admin")
     public String admin() {
         return "Welcome Admin";
+    }
+
+    @PostMapping("/send-email")
+    public String sendEmail() {
+
+        emailService.sendTestEmail(
+                "jatinchaurasiya301@gmail.com"   // ya apni email
+        );
+
+        return "Email Sent Successfully";
     }
 }

@@ -53,8 +53,9 @@ public class Booking {
 
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
-
     private LocalDateTime bookedAt;
+    @Column(length = 500)
+    private String rejectionReason;
 
     // Razorpay
 

@@ -51,4 +51,49 @@ public class BookingController {
                 "Booking Cancelled Successfully."
         );
     }
+    @GetMapping("/provider/bookingRequests")
+    public ResponseEntity<Page<BookingResponseDto>> getBookingRequests(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size) {
+        return ResponseEntity.ok(
+                bookingService.getProviderBookingRequests(page, size)
+        );
+    }
+    @PutMapping("/provider/booking/{bookingId}/accept")
+    public ResponseEntity<BookingResponseDto> acceptBooking(
+            @PathVariable Long bookingId) {
+
+        return ResponseEntity.ok(
+                bookingService.acceptBooking(bookingId)
+        );
+    }
+    @PutMapping("/provider/booking/{bookingId}/reject")
+    public ResponseEntity<BookingResponseDto> rejectBooking(
+            @PathVariable Long bookingId,
+            @RequestBody RejectBookingRequestDto request) {
+
+        return ResponseEntity.ok(
+                bookingService.rejectBooking(
+                        bookingId,
+                        request.getReason()
+                )
+        );
+    }
+    @PutMapping("/provider/booking/{bookingId}/complete")
+    public ResponseEntity<BookingResponseDto> completeBooking(
+            @PathVariable Long bookingId) {
+
+        return ResponseEntity.ok(
+                bookingService.completeBooking(bookingId)
+        );
+    }
+    @GetMapping("/provider/bookingHistory")
+    public ResponseEntity<Page<BookingResponseDto>> getBookingHistory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        return ResponseEntity.ok(
+                bookingService.getBookingHistory(page, size)
+        );
+    }
 }
