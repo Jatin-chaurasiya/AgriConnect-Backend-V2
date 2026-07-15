@@ -111,6 +111,7 @@ public class BookingServiceImpl implements BookingService {
                 service
         );
         Booking savedBooking = bookingRepository.save(booking);
+        emailService.sendBookingReceivedEmail(savedBooking);
         return convertToResponse(savedBooking);
     }
     @Override
@@ -201,9 +202,12 @@ public class BookingServiceImpl implements BookingService {
         Pageable pageable = PageRequest.of(page, size);
 
         return bookingRepository
-                .findByProviderAndStatusOrderByBookedAtDesc(
+                .findByProviderAndStatusInOrderByBookedAtDesc(
                         provider,
-                        BookingStatus.PENDING,
+                        List.of(
+                                BookingStatus.PENDING,
+                                BookingStatus.ACCEPTED
+                        ),
                         pageable
                 )
                 .map(this::convertToBookingResponse);
@@ -329,18 +333,25 @@ public class BookingServiceImpl implements BookingService {
 
         return BookingResponseDto.builder()
                 .bookingId(booking.getId())
+
+                .farmerName(booking.getFarmerName())
+                .mobile(booking.getMobile())
+                .village(booking.getVillage())
+                .address(booking.getAddress())
+
                 .serviceName(booking.getService().getServiceName())
                 .providerName(booking.getProvider().getBusinessName())
                 .district(booking.getService().getDistrict())
                 .price(booking.getService().getPrice())
                 .unit(booking.getService().getUnit())
+
                 .bookingDate(booking.getBookingDate().toString())
                 .bookingTime(booking.getBookingTime().toString())
+
                 .status(booking.getStatus())
-                .rejectionReason(
-                        booking.getRejectionReason()
-                )
+                .rejectionReason(booking.getRejectionReason())
                 .paymentStatus(booking.getPaymentStatus())
+
                 .build();
     }
     private VerifyPaymentResponseDto convertToResponse(

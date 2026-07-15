@@ -5,6 +5,7 @@ import Agri.AgriConnect.Dto.ServiceResponseDto;
 import Agri.AgriConnect.Entity.ServiceEntity;
 import Agri.AgriConnect.Entity.tbl_profiles;
 import Agri.AgriConnect.Entity.tbl_provider_details;
+import Agri.AgriConnect.Repository.BookingRepository;
 import Agri.AgriConnect.Repository.ProfileRepository;
 import Agri.AgriConnect.Repository.ProviderDetailsRepository;
 import Agri.AgriConnect.Repository.ServiceRepository;
@@ -27,6 +28,7 @@ public class ServiceServiceImpl implements ServiceService {
     private final ServiceRepository serviceRepository;
     private final ProfileRepository profileRepository;
     private final ProviderDetailsRepository providerDetailsRepository;
+    private final BookingRepository bookingRepository;
 
     @Override
     public ServiceResponseDto addService(ServiceRequestDto request) {
@@ -180,6 +182,14 @@ public class ServiceServiceImpl implements ServiceService {
 
         ServiceEntity service = serviceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Service not found"));
+
+        boolean hasBookings = bookingRepository.existsByService(service);
+
+        if (hasBookings) {
+            throw new RuntimeException(
+                    "Cannot delete service because bookings already exist."
+            );
+        }
 
         // Security Check
         if (!service.getProvider().getId().equals(provider.getId())) {

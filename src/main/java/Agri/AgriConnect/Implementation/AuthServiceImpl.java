@@ -9,6 +9,7 @@ import Agri.AgriConnect.Entity.tbl_profiles;
 import Agri.AgriConnect.Enum.Role;
 import Agri.AgriConnect.Repository.ProfileRepository;
 import Agri.AgriConnect.Service.AuthService;
+import Agri.AgriConnect.Service.EmailService;
 import Agri.AgriConnect.Util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +25,7 @@ public class AuthServiceImpl implements AuthService {
     private final ProviderDetailsRepository providerDetailsRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final EmailService emailService;
 
     @Override
     public MessageResponseDto register(RegisterRequestDto request) {
@@ -88,8 +90,20 @@ public class AuthServiceImpl implements AuthService {
                     .build();
 
             providerDetailsRepository.save(provider);
-        }
+            // Send Provider Registration Email
+            emailService.sendProviderRegistrationEmail(
+                    profile.getEmail(),
+                    provider.getBusinessName()
+            );
 
+        } else {
+
+            // Send Farmer Registration Email
+            emailService.sendFarmerRegistrationEmail(
+                    profile.getEmail(),
+                    profile.getUsername()
+            );
+        }
         return new MessageResponseDto("User registered successfully");
     }
 

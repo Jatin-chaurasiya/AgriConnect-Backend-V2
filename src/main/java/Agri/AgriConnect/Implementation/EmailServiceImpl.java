@@ -139,4 +139,118 @@ public class EmailServiceImpl implements EmailService {
 
         mailSender.send(message);
     }
+    @Override
+    public void sendBookingReceivedEmail(
+            Booking booking) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+
+        message.setTo(booking.getFarmer().getEmail());
+
+        message.setSubject("Booking Request Received | AgriConnect");
+
+        message.setText(
+
+                "Dear " + booking.getFarmerName() + ",\n\n"
+
+                        + "Thank you for booking a service through AgriConnect.\n\n"
+
+                        + "Your booking request has been received successfully.\n\n"
+
+                        + "Booking Details:\n"
+                        + "---------------------------------\n"
+                        + "Provider      : " + booking.getProvider().getBusinessName() + "\n"
+                        + "Service       : " + booking.getService().getServiceName() + "\n"
+                        + "Booking Date  : " + booking.getBookingDate() + "\n"
+                        + "Booking Time  : " + booking.getBookingTime() + "\n"
+                        + "Status        : UNDER REVIEW\n"
+                        + "---------------------------------\n\n"
+
+                        + "Our service provider will review your booking shortly.\n"
+
+                        + "You will receive another email once your booking is accepted or rejected.\n\n"
+
+                        + "Thank you for choosing AgriConnect.\n\n"
+
+                        + "Regards,\n"
+                        + "AgriConnect Team"
+
+        );
+
+        mailSender.send(message);
+    }
+    @Override
+    public void sendProviderRegistrationEmail(
+            String to,
+            String providerName) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+
+        message.setTo(to);
+
+        message.setSubject("Welcome to AgriConnect | Provider Registration Successful");
+
+        message.setText(
+
+                "Dear " + providerName + ",\n\n"
+
+                        + "Welcome to AgriConnect!\n\n"
+
+                        + "Your Provider account has been registered successfully.\n\n"
+
+                        + "You can now:\n"
+                        + "• Add Agricultural Services\n"
+                        + "• Manage Booking Requests\n"
+                        + "• Accept or Reject Bookings\n"
+                        + "• Complete Services\n"
+                        + "• Grow Your Agricultural Business\n\n"
+
+                        + "Thank you for partnering with AgriConnect.\n\n"
+
+                        + "We wish you continued success.\n\n"
+
+                        + "Regards,\n"
+                        + "AgriConnect Team"
+
+        );
+
+        mailSender.send(message);
+    }
+    @Override
+    public void sendFarmerRegistrationEmail(
+            String to,
+            String farmerName) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+
+        message.setTo(to);
+
+        message.setSubject("Welcome to AgriConnect | Farmer Registration Successful");
+
+        message.setText(
+
+                "Dear " + farmerName + ",\n\n"
+
+                        + "Welcome to AgriConnect!\n\n"
+
+                        + "Your Farmer account has been created successfully.\n\n"
+
+                        + "With AgriConnect you can:\n"
+                        + "• Explore Agricultural Services\n"
+                        + "• Book Trusted Service Providers\n"
+                        + "• Get Weather Updates\n"
+                        + "• View Government Schemes\n"
+                        + "• Receive Booking Notifications\n\n"
+
+                        + "Thank you for joining AgriConnect.\n\n"
+
+                        + "We wish you a successful farming journey.\n\n"
+
+                        + "Regards,\n"
+                        + "AgriConnect Team"
+
+        );
+
+        mailSender.send(message);
+    }
 }
