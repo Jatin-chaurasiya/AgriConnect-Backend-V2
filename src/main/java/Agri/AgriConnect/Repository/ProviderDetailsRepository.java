@@ -11,4 +11,5 @@ public interface ProviderDetailsRepository
 
     Optional<tbl_provider_details> findByProfile(tbl_profiles profile);
 
+    void deleteByProfile(tbl_profiles profile);
 }

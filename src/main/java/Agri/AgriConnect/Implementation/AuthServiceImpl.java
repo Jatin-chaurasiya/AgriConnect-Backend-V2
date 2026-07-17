@@ -118,30 +118,28 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // Role Validation
-        if (profile.getRole() != request.getRole()) {
-
-            switch (request.getRole()) {
-
-                case FARMER:
-                    throw new RuntimeException("This account is not registered as a Farmer.");
-
-                case PROVIDER:
-                    throw new RuntimeException("This account is not registered as a Service Provider.");
-
-                case ADMIN:
-                    throw new RuntimeException("This account is not registered as an Admin.");
-
-                default:
-                    throw new RuntimeException("Invalid account type.");
+        if (request.getRole() == Role.FARMER) {
+            if (profile.getRole() != Role.FARMER) {
+                throw new RuntimeException("This account is not registered as a Farmer.");
+            }
+        } else if (request.getRole() == Role.PROVIDER) {
+            if (providerDetailsRepository.findByProfile(profile).isEmpty()) {
+                throw new RuntimeException("This account is not registered as a Service Provider.");
+            }
+        } else if (request.getRole() == Role.ADMIN) {
+            if (profile.getRole() != Role.ADMIN) {
+                throw new RuntimeException("This account is not registered as an Admin.");
             }
         }
 
         String token = jwtUtil.generateToken(profile.getEmail());
-
+        boolean isProvider =
+                providerDetailsRepository.findByProfile(profile).isPresent();
         return new AuthResponseDto(
                 token,
                 profile.getUsername(),
-                profile.getRole()
+                profile.getRole(),
+                isProvider
         );
     }
 }

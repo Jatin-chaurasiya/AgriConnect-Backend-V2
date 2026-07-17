@@ -2,6 +2,7 @@ package Agri.AgriConnect.Repository;
 
 import Agri.AgriConnect.Entity.Booking;
 import Agri.AgriConnect.Entity.ServiceEntity;
+import Agri.AgriConnect.Entity.tbl_profiles;
 import Agri.AgriConnect.Entity.tbl_provider_details;
 import Agri.AgriConnect.Enum.BookingStatus;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             Long bookingId,
             Long farmerId
     );
+    void deleteByFarmer(tbl_profiles farmer);
+
     // ================= Provider =================
     boolean existsByService(ServiceEntity service);
     Page<Booking> findByProviderAndStatusOrderByBookedAtDesc(
@@ -41,5 +44,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Optional<Booking> findByIdAndProvider(
             Long bookingId,
             tbl_provider_details provider
+    );
+    void deleteByProvider(tbl_provider_details provider);
+    boolean existsByProviderAndStatusIn(
+            tbl_provider_details provider,
+            List<BookingStatus> statuses
     );
 }

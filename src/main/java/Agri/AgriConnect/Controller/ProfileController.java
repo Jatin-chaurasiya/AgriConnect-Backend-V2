@@ -1,7 +1,10 @@
 package Agri.AgriConnect.Controller;
 
+import Agri.AgriConnect.Dto.BecomeProviderRequestDto;
+import Agri.AgriConnect.Dto.BecomeProviderResponseDto;
 import Agri.AgriConnect.Dto.ProfileDto;
 import Agri.AgriConnect.Service.ProfileService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -32,6 +35,18 @@ public class ProfileController {
 
         ProfileDto profile = profileService.updateProfile(email, profileDto);
         return ResponseEntity.ok(profile);
+    }
+    @PostMapping("/become-provider")
+    public ResponseEntity<BecomeProviderResponseDto> becomeProvider(
+            Authentication authentication,
+            @Valid @RequestBody BecomeProviderRequestDto request) {
+
+        String email = authentication.getName();
+
+        BecomeProviderResponseDto response =
+                profileService.becomeProvider(email, request);
+
+        return ResponseEntity.ok(response);
     }
 
 }

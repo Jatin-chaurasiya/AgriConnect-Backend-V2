@@ -51,4 +51,5 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, Long> {
             @Param("keyword") String keyword,
             Pageable pageable
     );
+    void deleteByProvider(tbl_provider_details provider);
 }

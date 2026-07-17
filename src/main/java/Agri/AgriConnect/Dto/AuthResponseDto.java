@@ -9,5 +9,6 @@ import lombok.Data;
 public class AuthResponseDto {
     private String token;
     private String username;
-    private Role role;
+    private Role accountRole;      // Database identity
+    private boolean provider;
 }

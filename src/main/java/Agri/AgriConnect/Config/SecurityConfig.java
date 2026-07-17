@@ -5,6 +5,7 @@ import Agri.AgriConnect.Service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -48,11 +49,15 @@ public class SecurityConfig {
 
                         // Farmer APIs
                         .requestMatchers("/farmer/**").hasRole("FARMER")
+                        .requestMatchers("/profile/farmer/**").hasRole("FARMER")
+                        .requestMatchers("/profile/become-provider")
+                        .hasRole("FARMER")
 
                         // Provider APIs
                         .requestMatchers("/provider/**").hasRole("PROVIDER")
                         .requestMatchers("/bookings/provider/**")
                         .hasRole("PROVIDER")
+                        .requestMatchers("/profile/provider/**").hasRole("PROVIDER")
 
                         // Admin APIs
                         .requestMatchers("/admin/**").hasRole("ADMIN")
