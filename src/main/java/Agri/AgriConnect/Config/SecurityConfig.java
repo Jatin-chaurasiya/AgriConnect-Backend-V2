@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/chat/**").permitAll()
                         .requestMatchers("/schemes/**").permitAll()
                         .requestMatchers("/api/crop/**").permitAll()
+                        .requestMatchers("/crop-planner/**").permitAll()
                         .requestMatchers("/test/send-email").permitAll()
 
                         // Farmer APIs
